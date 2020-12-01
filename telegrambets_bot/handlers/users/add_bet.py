@@ -2,13 +2,13 @@ from aiogram import types
 from aiogram.dispatcher.filters import Command
 from aiogram.dispatcher import FSMContext
 from loader import dp, bot
-from states.BetState import Bet
-from keyboards.default import procent_banka, map_winner
+from states.new_bet import Bet
+from keyboards.default import procent_banka, map_winner, menu_keyboard
 from aiogram.types import ParseMode
 import aiogram.utils.markdown as md
 
 
-
+# TODO: добавить ставка по линии/лайв и сделать выбор: ставка на карту или на фул игру
 @dp.message_handler(Command("bet"), state=None)
 async def cmd_bet(message: types.Message):
     await Bet.p1.set()
@@ -67,10 +67,6 @@ async def process_bet(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
         data['bet'] = message.text
 
-        # Remove keyboard
-        markup = types.ReplyKeyboardMarkup()
-        markup.add('/bet')
-
         # And send message
         await bot.send_message(
             message.chat.id,
@@ -81,7 +77,7 @@ async def process_bet(message: types.Message, state: FSMContext):
                 md.text(data['bet']+"%"),
                 sep='\n',
             ),
-            reply_markup=markup,
+            reply_markup=menu_keyboard,
             parse_mode=ParseMode.MARKDOWN,
         )
         await bot.send_message(

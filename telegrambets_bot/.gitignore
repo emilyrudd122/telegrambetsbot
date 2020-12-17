@@ -5,7 +5,7 @@ __pycache__/
 
 # C extensions
 *.so
-
+vscode/
 # Distribution / packaging
 .Python
 build/
@@ -129,3 +129,11 @@ dmypy.json
 .pyre/
 .idea/*
 config.py
+
+telegrambets-43a64c64321e.json
+token.pickle
+quickstart.py
+credentials.json
+mydb.db
+utils/db_api/mydb.db
+.env

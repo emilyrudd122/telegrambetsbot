@@ -4,9 +4,13 @@ from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 menu_keyboard = ReplyKeyboardMarkup(
     keyboard=[
         [
-            KeyboardButton(text='/bet'),
-            KeyboardButton(text='/post'),
+            KeyboardButton(text='Ставка'),
+            KeyboardButton(text='Пост'),
+        ],
+        [
+            KeyboardButton(text='Ставки'),
         ]
+        
     ],
     resize_keyboard=True
 )

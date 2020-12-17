@@ -12,7 +12,6 @@ from utils.db_api import db
 
 
 # TODO: сделать выбор ставок типа на тотал/добавить опции для map4,map5
-# TODO: добавить ставка по линии/лайв и сделать выбор: ставка на карту или на фул игру
 @dp.message_handler(lambda message: message.text == 'Ставка', state=None)
 async def cmd_bet(message: types.Message):
     await Bet.bet_type.set()

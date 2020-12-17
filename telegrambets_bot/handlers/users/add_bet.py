@@ -3,7 +3,7 @@ from aiogram.dispatcher.filters import Command
 from aiogram.dispatcher import FSMContext
 from loader import dp, bot, service, spreadsheetId
 from states.new_bet import Bet
-from keyboards.default import procent_banka, map_winner, menu_keyboard
+from keyboards.default import procent_banka, map_winner, menu_keyboard, bet_type_keyboard
 from aiogram.types import ParseMode
 from aiogram.dispatcher.filters import Text
 import aiogram.utils.markdown as md
@@ -15,10 +15,18 @@ from utils.db_api import db
 # TODO: добавить ставка по линии/лайв и сделать выбор: ставка на карту или на фул игру
 @dp.message_handler(lambda message: message.text == 'Ставка', state=None)
 async def cmd_bet(message: types.Message):
-    await Bet.p1.set()
-    markup = types.ReplyKeyboardRemove()
+    await Bet.bet_type.set()
+    markup = bet_type_keyboard
 
-    await message.reply("Hi there! Who is p1", reply_markup=markup)
+    await message.reply("Hi there! is it live or line bet?", reply_markup=markup)
+    
+@dp.message_handler(state=Bet.bet_type)
+async def get_p1(message: types.Message, state: FSMContext):
+    await Bet.p1.set()
+    async with state.proxy() as data:
+        data['type'] = message.text
+    markup = types.ReplyKeyboardRemove()
+    await message.reply("Who is p1", reply_markup=markup)
     
 @dp.message_handler(state=Bet.p1)
 async def process_p1(message: types.Message, state: FSMContext):
@@ -134,6 +142,7 @@ async def process_bet(message: types.Message, state: FSMContext):
         msg = await bot.send_message(
             "@smirnoffbets",
             md.text(
+                md.text(md.bold(data['type'])),
                 md.text(data['p1'] + "/" + data['p2']),
                 md.text(md.bold(data['winner']) + " " + data['winner_map'] + " winner"),
                 md.text(data['coef']),

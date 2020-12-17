@@ -11,7 +11,7 @@ from utils.db_api import db
 
 
 
-# TODO: сделать выбор ставок типа на тотал/на серию/добавить опции для map4,map5
+# TODO: сделать выбор ставок типа на тотал/добавить опции для map4,map5
 # TODO: добавить ставка по линии/лайв и сделать выбор: ставка на карту или на фул игру
 @dp.message_handler(lambda message: message.text == 'Ставка', state=None)
 async def cmd_bet(message: types.Message):
@@ -48,7 +48,7 @@ async def process_winner(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
         data['winner'] = message.text
     await Bet.winner_map.set()
-    await message.reply("Which map will they win", reply_markup=map_winner)
+    await message.reply("what  will they win", reply_markup=map_winner)
     
 
 @dp.message_handler(state=Bet.winner_map)

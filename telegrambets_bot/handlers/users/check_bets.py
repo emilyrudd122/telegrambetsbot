@@ -23,7 +23,7 @@ async def cmd_check_bets(message: types.Message):
     
     for b in bets:
         stavki.append(b[post_id])
-        mes += "%d) %s/%s #%s# | %s | %s\n" % (i,b[p1], b[p2],b[map], b[coef], b[bet])
+        mes += "%d) %s/%s #%s# | %s | %s\n" % (i,b[p1], b[p2],b[winner], b[coef], b[bet])
         i+=1
         
     for a in range(1,i):

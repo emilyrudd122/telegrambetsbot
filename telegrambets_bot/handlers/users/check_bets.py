@@ -1,4 +1,5 @@
 from aiogram import types
+from aiogram.utils import exceptions
 from aiogram.dispatcher.filters import Command
 from aiogram.dispatcher import FSMContext
 from loader import dp, bot, service, spreadsheetId
@@ -71,28 +72,55 @@ async def check_status(message:types.Message, state: FSMContext):
                 "majorDimension": "ROWS",     # Сначала заполнять строки, затем столбцы
                 "values": [
                             [excel_win], # Заполняем первую строку
-                        ]}
+                ]}
             ]
         }).execute()
         print('bet %s updated(excel)' % (str(stavka_id)))
 
     
     res = '✅' if data['winlose'] == 1 else '❌'
+    # изменение поста со ставкой
+    try:
+        await bot.edit_message_text(
+            md.text(
+                md.text(this_bet[p1] + "/" + this_bet[p2]+res),
+                md.text(md.bold(this_bet[winner]) + " " + this_bet[winner_map] + " winner"),
+                md.text(this_bet[coef]),
+                md.text(this_bet[bet]+"%"),
+                sep='\n',
+            ),
+            "@smirnoffbets",
+            this_bet[post_id],
+            parse_mode=ParseMode.MARKDOWN,
+        )
+        print('post edited')
+    except exceptions.MessageNotModified:
+        print("post didnt change")
+    
+    # TODO: сделать обновление банка в закрепленном посте
+
+    ranges = ["Лист номер один!H25"] # 
+            
+    results = service.spreadsheets().values().batchGet(spreadsheetId = spreadsheetId, 
+                                        ranges = ranges, 
+                                        valueRenderOption = 'FORMATTED_VALUE',  
+                                        dateTimeRenderOption = 'FORMATTED_STRING').execute() 
+    sheet_values = results['valueRanges'][0]['values']
+    bank = sheet_values[0][0]
+    
     await bot.edit_message_text(
         md.text(
-            md.text(this_bet[p1] + "/" + this_bet[p2]+res),
-            md.text(md.bold(this_bet[winner]) + " " + this_bet[winner_map] + " winner"),
-            md.text(this_bet[coef]),
-            md.text(this_bet[bet]+"%"),
+            md.text("Процент берется всегда от текущего банка."),
+            md.text("Все ставки по линии лутбета"),
+            md.text("26.11.2020-26.12.2020"),
+            md.text("Начальный банк: 100.000р"),
+            md.text("Текущий банк: %s" % (bank)),
             sep='\n',
         ),
         "@smirnoffbets",
-        this_bet[post_id],
+        6,
         parse_mode=ParseMode.MARKDOWN,
     )
-    print('post edited')
-    
-    # TODO: сделать обновление банка в закрепленном посте
     
     stavki.clear()
     await message.reply("chekiruem", reply_markup=menu_keyboard)

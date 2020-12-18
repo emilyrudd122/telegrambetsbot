@@ -138,6 +138,7 @@ async def process_bet(message: types.Message, state: FSMContext):
         }).execute()
         print('added bet')
         db.update_number()
+        # пост в канал
         msg = await bot.send_message(
             "@smirnoffbets",
             md.text(

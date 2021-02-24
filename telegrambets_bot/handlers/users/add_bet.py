@@ -87,7 +87,6 @@ async def process_coef(message: types.Message, state: FSMContext):
 async def process_bet(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
         data['bet'] = message.text
-        qwe = str(db.get_number())
         # And send message
         await bot.send_message(
             message.chat.id,
@@ -96,71 +95,30 @@ async def process_bet(message: types.Message, state: FSMContext):
                 md.text(md.bold(data['winner']) + " " + data['winner_map'] + " winner"),
                 md.text(data['coef']),
                 md.text(data['bet']+"%"),
-                md.text("Номер ставки:"+qwe),
                 sep='\n',
             ),
             reply_markup=menu_keyboard,
             parse_mode=ParseMode.MARKDOWN,
         )
-        
-        coef_excel = data['coef'].replace('.',',')
-        yacheika = str(9+int(qwe))
-        # проверка номера ставки, если это первая ставка, то вносятся другие данные в первую ячейку
-        if(int(qwe) != 1):
-            # добавление ставки
-            service.spreadsheets().values().batchUpdate(spreadsheetId = spreadsheetId, body = {
-                "valueInputOption": "USER_ENTERED", # Данные воспринимаются, как вводимые пользователем (считается значение формул)
-                "data": [
-                    {"range": "Лист номер один!B" + yacheika +":H"+yacheika ,
-                    "majorDimension": "ROWS",     # Сначала заполнять строки, затем столбцы
-                    "values": [
-                                ["=IF(F%(q)s=\"да\";B%(q)s+E%(q)s;B%(q)s-G%(q)s)"%{"q":int(yacheika)-1}, data['bet'], coef_excel, "=B%s*(C%s/100)*(D%s-1)"%(yacheika, yacheika, yacheika), "", "=B%s*(C%s/100)"%(yacheika, yacheika), "=IF(F%(q)s=\"да\";B%(q)s+E%(q)s;B%(q)s-G%(q)s)"%{"q":yacheika}], # Заполняем первую строку
-                            ]}
-                ]
-            }).execute()
-        
-        else:
-            # добавление ставки
-            # здесь в первую ячейку вставляется просто сумма начального банка
-            service.spreadsheets().values().batchUpdate(spreadsheetId = spreadsheetId, body = {
-                "valueInputOption": "USER_ENTERED", # Данные воспринимаются, как вводимые пользователем (считается значение формул)
-                "data": [
-                    {"range": "Лист номер один!B" + yacheika +":H"+yacheika ,
-                    "majorDimension": "ROWS",     # Сначала заполнять строки, затем столбцы
-                    "values": [
-                                ["=C1", data['bet'], coef_excel, "=B%s*(C%s/100)*(D%s-1)"%(yacheika, yacheika, yacheika), "", "=B%s*(C%s/100)"%(yacheika, yacheika), "=IF(F%(q)s=\"да\";B%(q)s+E%(q)s;B%(q)s-G%(q)s)"%{"q":yacheika}], # Заполняем первую строку
-                            ]}
-                ]
-            }).execute()
-
-        # обновление ячейки с банком
-        service.spreadsheets().values().batchUpdate(spreadsheetId = spreadsheetId, body = {
-            "valueInputOption": "USER_ENTERED", # Данные воспринимаются, как вводимые пользователем (считается значение формул)
-            "data": [
-                {"range": "Лист номер один!E1",
-                "majorDimension": "ROWS",     # Сначала заполнять строки, затем столбцы
-                "values": [
-                            ["=H"+yacheika], # Заполняем первую строку
-                        ]}
-            ]
-        }).execute()
-        print('added bet')
-        db.update_number()
-        # пост в канал
+            
         msg = await bot.send_message(
             "@smirnoffbets",
             md.text(
-                md.text(md.bold(data['bet_type']) + " " + data['game_type']),
-                md.text(data['p1'] + "/" + data['p2']),
+                md.text(md.bold(data['game_type'] + " " + data['bet_type'])),
+                md.text(),
+                md.text(data['p1'] + " vs " + data['p2']),
                 md.text(md.bold(data['winner']) + " " + data['winner_map'] + " winner"),
+                md.text(),
                 md.text(data['coef']),
                 md.text(data['bet']+"%"),
                 sep='\n',
             ),
             parse_mode=ParseMode.MARKDOWN,
         )
+
+        print('added bet')
         msg_id = msg['message_id']
-        db.input_bet(data['p1'], data['p2'], data['winner'], data['winner_map'], data['coef'], data['bet'], msg_id, yacheika)
+        db.input_bet(data['p1'], data['p2'], data['winner'], data['winner_map'], data['coef'], data['bet'], msg_id)
 
     # Finish conversation
     await state.finish()

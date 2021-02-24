@@ -7,6 +7,10 @@ bet_type_keyboard = ReplyKeyboardMarkup(
             KeyboardButton(text='Лайв'),
             KeyboardButton(text='Линия'),
         ],
+        [
+            KeyboardButton(text='Офлайн'),
+            
+        ],
     ],
     resize_keyboard=True
 )

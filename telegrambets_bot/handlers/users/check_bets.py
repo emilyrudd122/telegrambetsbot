@@ -74,12 +74,7 @@ async def check_status(message:types.Message, state: FSMContext):
     # изменение поста со ставкой
     try:
         await bot.edit_message_text(
-            md.text(
-                md.text(this_bet[p1] + "/" + this_bet[p2]+res),
-                md.text(md.bold(this_bet[winner]) + " " + this_bet[winner_map] + " winner"),
-                md.text(this_bet[coef]),
-                md.text(this_bet[bet]+"%"),
-                
+            md.text(              
                 md.text(md.bold(this_bet[game_type]) + " " + res + res),
                 md.text(),
                 md.text(this_bet[p1] + " vs " + this_bet[p2]),

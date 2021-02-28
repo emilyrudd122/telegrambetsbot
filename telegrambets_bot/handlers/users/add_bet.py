@@ -1,7 +1,7 @@
 from aiogram import types
 from aiogram.dispatcher.filters import Command
 from aiogram.dispatcher import FSMContext
-from loader import dp, bot, service, spreadsheetId
+from loader import dp, bot
 from states.new_bet import Bet
 from keyboards.default import procent_banka, map_winner, menu_keyboard, bet_type_keyboard, game_type_keyboard
 from aiogram.types import ParseMode
@@ -12,6 +12,7 @@ from utils.db_api import db
 
 
 # TODO: сделать выбор ставок типа на тотал/добавить опции для map4,map5
+# TODO: сделать выбор постить банк в канал или нет
 @dp.message_handler(lambda message: message.text == 'Ставка', state=None)
 async def cmd_bet(message: types.Message):
     await Bet.bet_type.set()
@@ -79,7 +80,7 @@ async def process_coef(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
         data['coef'] = message.text
     await Bet.bet.set()
-    await message.reply("Процент банка", reply_markup=procent_banka)
+    await message.reply("Размер ставки (в рублях)", reply_markup=procent_banka)
     
     
     
@@ -94,7 +95,7 @@ async def process_bet(message: types.Message, state: FSMContext):
                 md.text(data['p1'] + "/" + data['p2']),
                 md.text(md.bold(data['winner']) + " " + data['winner_map'] + " winner"),
                 md.text(data['coef']),
-                md.text(data['bet']+"%"),
+                md.text(data['bet']+"р."),
                 sep='\n',
             ),
             reply_markup=menu_keyboard,
@@ -110,7 +111,7 @@ async def process_bet(message: types.Message, state: FSMContext):
                 md.text(md.bold(data['winner']) + " " + data['winner_map'] + " winner"),
                 md.text(),
                 md.text(data['coef']),
-                md.text(data['bet']+"%"),
+                md.text(data['bet']+"р."),
                 sep='\n',
             ),
             parse_mode=ParseMode.MARKDOWN,
@@ -118,7 +119,8 @@ async def process_bet(message: types.Message, state: FSMContext):
 
         print('added bet')
         msg_id = msg['message_id']
-        db.input_bet(data['p1'], data['p2'], data['winner'], data['winner_map'], data['coef'], data['bet'], msg_id)
+        db.update_bank(data['bet'], "minus")
+        db.input_bet(data['p1'], data['p2'], data['winner'], data['winner_map'], data['coef'], data['bet'], msg_id, data['game_type'])
 
     # Finish conversation
     await state.finish()

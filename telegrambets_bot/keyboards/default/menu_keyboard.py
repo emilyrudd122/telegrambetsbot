@@ -6,6 +6,7 @@ menu_keyboard = ReplyKeyboardMarkup(
         [
             KeyboardButton(text='Ставка'),
             KeyboardButton(text='Пост'),
+            KeyboardButton(text='Банк'),
         ],
         [
             KeyboardButton(text='Ставки'),

@@ -28,7 +28,7 @@ async def process_msg(message: types.Message, state: FSMContext):
 @dp.message_handler(lambda message: message.text=='Да', state=Post.end)
 async def post_msg(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
-        msg = await bot.send_message(
+        await bot.send_message(
             "@smirnoffbets",
             md.text(data['message']),
             parse_mode=ParseMode.MARKDOWN,

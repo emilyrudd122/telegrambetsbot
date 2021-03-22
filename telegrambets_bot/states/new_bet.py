@@ -2,6 +2,8 @@ from aiogram.dispatcher.filters.state import StatesGroup, State
 
 
 class Bet(StatesGroup):
+    bet_type = State()
+    game_type = State()
     p1 = State()
     p2 = State()
     winner = State()
